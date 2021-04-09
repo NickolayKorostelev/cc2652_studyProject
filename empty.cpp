@@ -33,45 +33,43 @@
 /*
  *  ======== empty.c ========
  */
-
-/* For usleep() */
 #include <unistd.h>
 #include <stdint.h>
 #include <stddef.h>
 
 /* Driver Header files */
 #include <ti/drivers/GPIO.h>
-// #include <ti/drivers/I2C.h>
-// #include <ti/drivers/SPI.h>
-// #include <ti/drivers/UART.h>
-// #include <ti/drivers/Watchdog.h>
 
 /* Driver configuration */
 #include "ti_drivers_config.h"
 
+#include "I2Cdev.h"
+
 /*
  *  ======== mainThread ========
  */
-void *mainThread(void *arg0)
+extern "C"
 {
-    /* 1 second delay */
-    uint32_t time = 1;
+    void *mainThread(void *arg0)
+    {
+        /* Call driver init functions */
+        GPIO_init();
 
-    /* Call driver init functions */
-    GPIO_init();
-    // I2C_init();
-    // SPI_init();
-    // UART_init();
-    // Watchdog_init();
 
-    /* Configure the LED pin */
-    GPIO_setConfig(CONFIG_GPIO_LED_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
+        I2Cdev *i2cSocket = new I2Cdev(I2C_400kHz, TEST_I2C);
 
-    /* Turn on user LED */
-    GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
+        /* Configure the LED pin */
+        GPIO_setConfig(CONFIG_GPIO_LED_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
 
-    while (1) {
-        sleep(time);
-        GPIO_toggle(CONFIG_GPIO_LED_0);
+        /* Turn on user LED */
+        GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
+
+        time_t time = 1;
+
+        while (1)
+        {
+            sleep(time);
+            GPIO_toggle(CONFIG_GPIO_LED_0);
+        }
     }
 }
