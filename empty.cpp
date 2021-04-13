@@ -40,6 +40,7 @@
 /* Driver Header files */
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/apps/Button.h>
+#include <ti/drivers/apps/LED.h>
 
 /* Driver configuration */
 #include "ti_drivers_config.h"
@@ -64,6 +65,12 @@ struct Aiss
 };
 Semaphore_Struct semStruct;
 Semaphore_Handle semHandle;
+
+Button_Params buttonParams;
+Button_Handle configHandle = NULL;
+LED_Params ledParams;
+LED_Handle ledHandle = NULL;
+
 /*
  *  ======== mainThread ========
  */
@@ -72,23 +79,28 @@ extern "C" {
 void bntConfigCallback(Button_Handle buttonHandle,
                        Button_EventMask buttonEvents)
 {
-    switch(buttonEvents)
+    switch (buttonEvents)
     {
-        case Button_EV_PRESSED:
+    case Button_EV_PRESSED:
         break;
-        case Button_EV_DOUBLECLICKED:
-            GPIO_write(CONFIG_GPIO_LED_0,1);
-            Semaphore_post(semHandle);
+    case Button_EV_DOUBLECLICKED:
+        LED_setOn(ledHandle, 1);
+        for (uint8_t i = 0; i < 255; i++)
+        {
+            LED_setBrightnessLevel(ledHandle, i);
+            usleep(10000);
+        }
+        Semaphore_post(semHandle);
         break;
-        case Button_EV_LONGCLICKED:
+    case Button_EV_LONGCLICKED:
         break;
-        case Button_EV_LONGPRESSED:
+    case Button_EV_LONGPRESSED:
         break;
-        case Button_EV_CLICKED:
+    case Button_EV_CLICKED:
         break;
-        case Button_EV_RELEASED:
+    case Button_EV_RELEASED:
         break;
-        default:
+    default:
         break;
     }
     return;
@@ -98,9 +110,10 @@ void* mainThread(void *arg0)
 {
     /* Call driver init functions */
     GPIO_init();
+    Button_init();
+    LED_init();
 
-    Button_Params buttonParams;
-    Button_Handle configHandle = NULL;
+
 
     /* Construct a Semaphore object to be use as a resource lock, inital count 1 */
     Semaphore_Params semParams;
@@ -125,7 +138,11 @@ void* mainThread(void *arg0)
         while(1);
     }
 
-    I2Cdev *i2cSocket = new I2Cdev(I2C_400kHz, TEST_I2C);
+    ledParams.setState = LED_STATE_OFF;
+    ledParams.brightness = 75;
+    ledParams.blinkPeriod = 500;
+    LED_Params_init(&ledParams);
+    ledHandle = LED_open(CONFIG_LED_0, &ledParams);
 
     Aiss acceleration = { 0 };
     Aiss rotation = { 0 };
@@ -134,12 +151,6 @@ void* mainThread(void *arg0)
     MPU6050 *accelerometer = new MPU6050();
 
     Kalman *filter = new Kalman();
-
-    /* Configure the LED pin */
-    GPIO_setConfig(CONFIG_GPIO_LED_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
-
-    /* Turn on user LED */
-    GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
 
     while (1)
     {
@@ -164,7 +175,13 @@ void* mainThread(void *arg0)
                                 (acceleration.z * acceleration.z)
                                         + (acceleration.x * acceleration.x))
                                 / acceleration.z));
-        GPIO_write(CONFIG_GPIO_LED_0,0);
+
+        for (uint8_t i = 100; i > 0; i--)
+        {
+            LED_setBrightnessLevel(ledHandle, i);
+            usleep(10000);
+        }
+        LED_setOff(ledHandle);
     }
 }
 }
