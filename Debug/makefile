@@ -143,7 +143,7 @@ all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@$(MAKE) --no-print-directory -Onone "empty_CC26X2R1_LAUNCHXL_tirtos_ccs.out"
 
 dependents:
-	-cd C:/Users/Nikolay/workspace_v10/tirtos_builds_cc13x2_cc26x2_release_ccs_4_40_04_04/Debug && $(MAKE) all
+	-cd C:/Users/Nikolay/workspace_v10/tirtos_builds_cc13x2_cc26x2_release_ccs_4_40_04_04/Debug && $(MAKE) clean all
 
 # Tool invocations
 empty_CC26X2R1_LAUNCHXL_tirtos_ccs.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS) C:/Users/Nikolay/workspace_v10/tirtos_builds_cc13x2_cc26x2_release_ccs_4_40_04_04/Debug/tirtos_builds_cc13x2_cc26x2_release_ccs_4_40_04_04.lib
