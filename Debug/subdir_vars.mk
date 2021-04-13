@@ -7,7 +7,9 @@ SHELL = cmd.exe
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../I2Cdev.cpp \
-../empty.cpp 
+../MPU6050.cpp \
+../empty.cpp \
+../kalman.cpp 
 
 CMD_SRCS += \
 ../cc13x2_cc26x2_tirtos.cmd 
@@ -34,9 +36,11 @@ C_DEPS += \
 
 OBJS += \
 ./I2Cdev.obj \
+./MPU6050.obj \
 ./empty.obj \
 ./syscfg/ti_devices_config.obj \
 ./syscfg/ti_drivers_config.obj \
+./kalman.obj \
 ./main_tirtos.obj 
 
 GEN_MISC_FILES += \
@@ -48,16 +52,20 @@ GEN_MISC_FILES += \
 
 CPP_DEPS += \
 ./I2Cdev.d \
-./empty.d 
+./MPU6050.d \
+./empty.d \
+./kalman.d 
 
 GEN_MISC_DIRS__QUOTED += \
 "syscfg\" 
 
 OBJS__QUOTED += \
 "I2Cdev.obj" \
+"MPU6050.obj" \
 "empty.obj" \
 "syscfg\ti_devices_config.obj" \
 "syscfg\ti_drivers_config.obj" \
+"kalman.obj" \
 "main_tirtos.obj" 
 
 GEN_MISC_FILES__QUOTED += \
@@ -74,7 +82,9 @@ C_DEPS__QUOTED += \
 
 CPP_DEPS__QUOTED += \
 "I2Cdev.d" \
-"empty.d" 
+"MPU6050.d" \
+"empty.d" \
+"kalman.d" 
 
 GEN_FILES__QUOTED += \
 "syscfg\ti_devices_config.c" \
@@ -82,7 +92,9 @@ GEN_FILES__QUOTED += \
 
 CPP_SRCS__QUOTED += \
 "../I2Cdev.cpp" \
-"../empty.cpp" 
+"../MPU6050.cpp" \
+"../empty.cpp" \
+"../kalman.cpp" 
 
 SYSCFG_SRCS__QUOTED += \
 "../empty.syscfg" 

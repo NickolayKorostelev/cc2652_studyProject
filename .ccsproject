@@ -13,6 +13,6 @@
 	<ignoreDefaultDeviceSettings value="true"/>
 	<ignoreDefaultCCSSettings value="true"/>
 	<templateProperties value="id=empty_CC26X2R1_LAUNCHXL_tirtos_ccs.projectspec.empty_CC26X2R1_LAUNCHXL_tirtos_ccs,buildProfile=release,isHybrid=true"/>
-	<origin value="C:\ti\simplelink_cc13x2_26x2_sdk_4_40_04_04\examples\rtos\CC26X2R1_LAUNCHXL\drivers\empty\tirtos\ccs\empty_CC26X2R1_LAUNCHXL_tirtos_ccs.projectspec"/>
+	<origin value="C:/Users/Nikolay/workspace_v10/cc2652_studyProject"/>
 	<filesToOpen value=""/>
 </projectOptions>
