@@ -39,6 +39,7 @@
 
 /* Driver Header files */
 #include <ti/drivers/GPIO.h>
+#include <ti/drivers/apps/Button.h>
 
 /* Driver configuration */
 #include "ti_drivers_config.h"
@@ -48,6 +49,10 @@
 #include "MPU6050.h"
 #include <Cmath>
 
+#include <ti/sysbios/BIOS.h>
+#include <ti/sysbios/knl/Clock.h>
+#include <ti/sysbios/knl/Task.h>
+#include <ti/sysbios/knl/Semaphore.h>
 /*
  * struct for acceleration and rotation values
  */
@@ -57,15 +62,68 @@ struct Aiss
     int16_t y;
     int16_t z;
 };
-
+Semaphore_Struct semStruct;
+Semaphore_Handle semHandle;
 /*
  *  ======== mainThread ========
  */
+
 extern "C" {
+void bntConfigCallback(Button_Handle buttonHandle,
+                       Button_EventMask buttonEvents)
+{
+    switch(buttonEvents)
+    {
+        case Button_EV_PRESSED:
+        break;
+        case Button_EV_DOUBLECLICKED:
+            GPIO_write(CONFIG_GPIO_LED_0,1);
+            Semaphore_post(semHandle);
+        break;
+        case Button_EV_LONGCLICKED:
+        break;
+        case Button_EV_LONGPRESSED:
+        break;
+        case Button_EV_CLICKED:
+        break;
+        case Button_EV_RELEASED:
+        break;
+        default:
+        break;
+    }
+    return;
+}
+
 void* mainThread(void *arg0)
 {
     /* Call driver init functions */
     GPIO_init();
+
+    Button_Params buttonParams;
+    Button_Handle configHandle = NULL;
+
+    /* Construct a Semaphore object to be use as a resource lock, inital count 1 */
+    Semaphore_Params semParams;
+    semParams.mode = ti_sysbios_knl_Semaphore_Mode_BINARY;
+    Semaphore_Params_init(&semParams);
+    Semaphore_construct(&semStruct, 0, &semParams);
+
+    /* Obtain instance handle */
+    semHandle = Semaphore_handle(&semStruct);
+
+    buttonParams.debounceDuration = 50;
+    buttonParams.buttonEventMask = 0xFF;
+    buttonParams.doublePressDetectiontimeout = 300;
+    buttonParams.longPressDuration = 300;
+
+    Button_Params_init(&buttonParams);
+    configHandle = Button_open(CONFIG_BUTTON_0, bntConfigCallback,
+                               &buttonParams);
+
+    if(configHandle == NULL)
+    {
+        while(1);
+    }
 
     I2Cdev *i2cSocket = new I2Cdev(I2C_400kHz, TEST_I2C);
 
@@ -83,11 +141,9 @@ void* mainThread(void *arg0)
     /* Turn on user LED */
     GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
 
-    time_t time = 1;
-
     while (1)
     {
-        sleep(time);
+        Semaphore_pend(semHandle, BIOS_WAIT_FOREVER);
         accelerometer->getRotation(&rotation.x, &rotation.y, &rotation.z);/*read rotation from gyroscope to local struct*/
         accelerometer->getAcceleration(&acceleration.x, &acceleration.y,
                                        &acceleration.z);/*read acceleration from gyroscope to local struct*/
@@ -108,7 +164,7 @@ void* mainThread(void *arg0)
                                 (acceleration.z * acceleration.z)
                                         + (acceleration.x * acceleration.x))
                                 / acceleration.z));
-        GPIO_toggle(CONFIG_GPIO_LED_0);
+        GPIO_write(CONFIG_GPIO_LED_0,0);
     }
 }
 }
