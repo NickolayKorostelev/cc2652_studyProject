@@ -11,9 +11,11 @@ GEN_CMDS__FLAG := -l"C:/Users/Nikolay/workspace_v10/tirtos_builds_cc13x2_cc26x2_
 
 ORDERED_OBJS += \
 "./I2Cdev.obj" \
+"./MPU6050.obj" \
 "./empty.obj" \
 "./syscfg/ti_devices_config.obj" \
 "./syscfg/ti_drivers_config.obj" \
+"./kalman.obj" \
 "./main_tirtos.obj" \
 "../cc13x2_cc26x2_tirtos.cmd" \
 -lti_utils_build_linker.cmd.genlibs \
@@ -143,7 +145,7 @@ all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@$(MAKE) --no-print-directory -Onone "empty_CC26X2R1_LAUNCHXL_tirtos_ccs.out"
 
 dependents:
-	-cd C:/Users/Nikolay/workspace_v10/tirtos_builds_cc13x2_cc26x2_release_ccs_4_40_04_04/Debug && $(MAKE) clean all
+	-cd C:/Users/Nikolay/workspace_v10/tirtos_builds_cc13x2_cc26x2_release_ccs_4_40_04_04/Debug && $(MAKE) all
 
 # Tool invocations
 empty_CC26X2R1_LAUNCHXL_tirtos_ccs.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS) C:/Users/Nikolay/workspace_v10/tirtos_builds_cc13x2_cc26x2_release_ccs_4_40_04_04/Debug/tirtos_builds_cc13x2_cc26x2_release_ccs_4_40_04_04.lib
@@ -163,9 +165,9 @@ empty_CC26X2R1_LAUNCHXL_tirtos_ccs.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "I2Cdev.obj" "empty.obj" "syscfg\ti_devices_config.obj" "syscfg\ti_drivers_config.obj" "main_tirtos.obj" 
+	-$(RM) "I2Cdev.obj" "MPU6050.obj" "empty.obj" "syscfg\ti_devices_config.obj" "syscfg\ti_drivers_config.obj" "kalman.obj" "main_tirtos.obj" 
 	-$(RM) "syscfg\ti_devices_config.d" "syscfg\ti_drivers_config.d" "main_tirtos.d" 
-	-$(RM) "I2Cdev.d" "empty.d" 
+	-$(RM) "I2Cdev.d" "MPU6050.d" "empty.d" "kalman.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'
 	-@echo ' '
